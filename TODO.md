@@ -16,3 +16,5 @@
   - [ ] maybe fly.io
 - [ ] create a pfp
 - [ ] use ai to determine if word is bad
+- [ ] find out how i should store secrets and word lists
+  - [ ] maybe use .env instead of secrets
