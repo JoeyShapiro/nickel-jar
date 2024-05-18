@@ -79,11 +79,20 @@ async def summary(ctx):
     print(f"summary called by {ctx.author.name}", flush=True)
     cursor = conn.cursor()
     cursor.execute("select word, count(*) from nickels where username=%s group by word", (ctx.author.name,))
-    nickels = cursor.fetchall()
+    rows = cursor.fetchall()
     cursor.close()
-    print(nickels, flush=True)
-    message = f"Nickel jar has {len(nickels)} nickels. {ctx.author.name} has donated ${len(nickels) * 0.05}"
-    message += '\n'.join([f"{word}: {count}" for word, count in nickels])
-    await ctx.send(message)
+    
+    nickels = 0
+    messages = [  ]
+    for word, count in rows:
+        messages.append(f"{word}: {count}")
+        nickels += count
+    
+    # add message to the beginning of the list
+    messages = [f"{ctx.author.name} has {nickels} nickels"] + messages
+    messages.append(f"{ctx.author.name} has donated ${(nickels*0.05):.2f}")
+    
+    for message in messages:
+        await ctx.send(message)
 
 bot.run(secrets['discord-token'], log_handler=handler, log_level=logging.INFO)
