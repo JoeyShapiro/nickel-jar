@@ -29,10 +29,9 @@ conn = mysql.connector.connect(
     host="db",
     user="admin",
     password="toor",
-    database="nickeljar"
+    database="nickeljar",
+    autocommit=True
 )
-
-print(conn)
 
 # This example requires the 'message_content' intent.
 
@@ -49,7 +48,6 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(message.content, flush=True)
     await bot.process_commands(message)
     
     if message.author == bot.user:
@@ -58,9 +56,19 @@ async def on_message(message):
     content = message.content.lower()
     # remove punctuation
     content = ''.join(e for e in content if e.isalnum() or e.isspace())
+    vulgarity = {}
     for word in content.split():
         if word in words:
             await message.channel.send(f"{message.author} added a nickel to the jar")
+            # add_nickel(message)
+            vulgarity[word] = vulgarity.get(word, 0) + 1
+    
+    cursor = conn.cursor()
+    for word, count in vulgarity.items():
+        cursor.execute("insert into nickels (guild, username, word) VALUES (%s, %s, %s)",
+                       (message.guild.name, message.author.name, word)
+                      )
+    cursor.close()
 
 @bot.command()
 async def word_list(ctx):
@@ -68,6 +76,14 @@ async def word_list(ctx):
 
 @bot.command()
 async def summary(ctx):
-    await ctx.send(f"Nickel jar has {len(words)} nickel(s)")
+    print(f"summary called by {ctx.author.name}", flush=True)
+    cursor = conn.cursor()
+    cursor.execute("select word, count(*) from nickels where username=%s group by word", (ctx.author.name,))
+    nickels = cursor.fetchall()
+    cursor.close()
+    print(nickels, flush=True)
+    message = f"Nickel jar has {len(nickels)} nickels. {ctx.author.name} has donated ${len(nickels) * 0.05}"
+    message += '\n'.join([f"{word}: {count}" for word, count in nickels])
+    await ctx.send(message)
 
 bot.run(secrets['discord-token'], log_handler=handler, log_level=logging.INFO)

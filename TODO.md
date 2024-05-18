@@ -6,12 +6,13 @@
 - [x] look up words in list
   - [x] multiple word lists
   - [ ] add custom words
-- [ ] store in database
-  - [ ] use fancy database
-  - [ ] create a summary report
+- [x] store in database
+  - [ ] use fancy/modern database
+  - [x] create a summary report
     - [ ] hide the bad words (*ss | a**)
-  - [ ] multiple servers
+  - [x] multiple servers
     - [ ] give cross server summary
+    - [ ] use guild id
 - [x] make containers
 - [ ] host on cloud
   - [ ] maybe fly.io
