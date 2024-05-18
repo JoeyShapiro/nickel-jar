@@ -85,11 +85,13 @@ async def summary(ctx):
     nickels = 0
     messages = [  ]
     for word, count in rows:
-        messages.append(f"{word}: {count}")
+        # convert word to a** format
+        censored = word[0] + ('\*' * (len(word)-1))
+        messages.append(f"{censored}: {count}")
         nickels += count
     
     # add message to the beginning of the list
-    messages = [f"{ctx.author.name} has {nickels} nickels"] + messages
+    messages = [f"There are {nickels} nickels in the jar"] + messages
     messages.append(f"{ctx.author.name} has donated ${(nickels*0.05):.2f}")
     
     for message in messages:
