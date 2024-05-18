@@ -1,0 +1,18 @@
+- [ ] create discord bot
+  - [ ] read messages
+  - [ ] use discord bot params
+  - [ ] nicely handle multiple flagged words in one message
+- [ ] look up words in list
+  - [ ] multiple word lists
+  - [ ] add custom words
+- [ ] store in database
+  - [ ] use fancy database
+  - [ ] create a summary report
+    - [ ] hide the bad words (*ss | a**)
+  - [ ] multiple servers
+    - [ ] give cross server summary
+- [ ] make containers
+- [ ] host on cloud
+  - [ ] maybe fly.io
+- [ ] create a pfp
+- [ ] use ai to determine if word is bad
