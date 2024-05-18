@@ -1,10 +1,10 @@
-- [ ] create discord bot
-  - [ ] read messages
+- [x] create discord bot
+  - [x] read messages
   - [ ] use discord bot params
   - [ ] nicely handle multiple flagged words in one message
   - [ ] simplify permissions
-- [ ] look up words in list
-  - [ ] multiple word lists
+- [x] look up words in list
+  - [x] multiple word lists
   - [ ] add custom words
 - [ ] store in database
   - [ ] use fancy database
