@@ -3,26 +3,43 @@ import discord
 from discord.ext import commands
 import logging
 import os
+import mysql.connector
+import time
 
-with open('server/secrets.json', 'r') as f:
+# print version of discord.py
+print(discord.__version__)
+
+data_path = 'data'
+
+with open(f'{data_path}/secrets.json', 'r') as f:
     content = f.read()
     secrets = json.loads(content)
 
 # load all word lists in memory (ext is txt)
 words = []
-for file in os.listdir('server/'):
+for file in os.listdir(f'{data_path}/'):
     if file.endswith('.txt'):
-        with open('server/example.txt', 'r') as f:
+        with open(f'{data_path}/example.txt', 'r') as f:
             for line in f:
                 words.append(line.strip())
 print(f"Loaded {len(words)} word(s)", flush=True)
+
+time.sleep(10)
+conn = mysql.connector.connect(
+    host="db",
+    user="admin",
+    password="toor",
+    database="nickeljar"
+)
+
+print(conn)
 
 # This example requires the 'message_content' intent.
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-handler = logging.FileHandler(filename='server/discord.log', encoding='utf-8', mode='a')
+handler = logging.FileHandler(filename=f'{data_path}/discord.log', encoding='utf-8', mode='a')
 
 # client = discord.Client(intents=intents)
 

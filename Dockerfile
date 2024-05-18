@@ -1,7 +1,9 @@
-FROM python:3.7-slim
+FROM python:3.8-slim
 
 RUN mkdir -p /app/data
-RUN pip install discord.py
+RUN apt-get update
+RUN pip install --upgrade pip
+RUN pip install discord.py mysql-connector-python
 
 COPY nickel-jar.py /app/nickel-jar.py
 

@@ -6,7 +6,7 @@ services:
       - ./schemas:/docker-entrypoint-initdb.d:ro
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?error}
-      MYSQL_DATABASE: nickels
+      MYSQL_DATABASE: nickeljar
       MYSQL_USER: ${DB_USERNAME:-admin}
       MYSQL_PASSWORD: ${DB_PASSWORD:?error}
     ports:

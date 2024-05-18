@@ -12,7 +12,7 @@
     - [ ] hide the bad words (*ss | a**)
   - [ ] multiple servers
     - [ ] give cross server summary
-- [ ] make containers
+- [x] make containers
 - [ ] host on cloud
   - [ ] maybe fly.io
 - [ ] create a pfp
