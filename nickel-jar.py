@@ -24,15 +24,18 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 handler = logging.FileHandler(filename='server/discord.log', encoding='utf-8', mode='a')
 
-client = discord.Client(intents=intents)
+# client = discord.Client(intents=intents)
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}', flush=True)
+    print(f'We have logged in as {bot.user}', flush=True)
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    print(message.content, flush=True)
+    await bot.process_commands(message)
+    
+    if message.author == bot.user:
         return
 
     content = message.content.lower()
@@ -42,4 +45,12 @@ async def on_message(message):
         if word in words:
             await message.channel.send(f"{message.author} added a nickel to the jar")
 
-client.run(secrets['discord-token'], log_handler=handler, log_level=logging.INFO)
+@bot.command()
+async def word_list(ctx):
+    await ctx.send(f"Loaded {len(words)} word(s)")
+
+@bot.command()
+async def summary(ctx):
+    await ctx.send(f"Nickel jar has {len(words)} nickel(s)")
+
+bot.run(secrets['discord-token'], log_handler=handler, log_level=logging.INFO)
