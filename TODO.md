@@ -2,6 +2,7 @@
   - [ ] read messages
   - [ ] use discord bot params
   - [ ] nicely handle multiple flagged words in one message
+  - [ ] simplify permissions
 - [ ] look up words in list
   - [ ] multiple word lists
   - [ ] add custom words
@@ -18,3 +19,4 @@
 - [ ] use ai to determine if word is bad
 - [ ] find out how i should store secrets and word lists
   - [ ] maybe use .env instead of secrets
+- [ ] make this java so i can call it `nickel.jar`

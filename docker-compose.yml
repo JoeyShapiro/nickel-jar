@@ -18,7 +18,7 @@ services:
     ports:
       - 8080
     volumes:
-      - ./server:/app/data
+      - ./server:/app/data:rw
   # security:
   #   build: ./security
   #   depends_on:
