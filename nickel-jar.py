@@ -86,8 +86,8 @@ async def summary(ctx):
     messages = [  ]
     for word, count in rows:
         # convert word to a** format
-        censored = word[0] + ('\*' * (len(word)-1))
-        messages.append(f"{censored}: {count}")
+        # censored = word[0] + ('\*' * (len(word)-1))
+        messages.append(f"{word}: {count}")
         nickels += count
     
     # add message to the beginning of the list

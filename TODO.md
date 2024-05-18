@@ -3,6 +3,8 @@
   - [ ] use discord bot params
   - [ ] nicely handle multiple flagged words in one message
   - [ ] simplify permissions
+  - [ ] send one message for summary
+  - [ ] censor somtimes
 - [x] look up words in list
   - [x] multiple word lists
   - [ ] add custom words
