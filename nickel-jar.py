@@ -11,9 +11,11 @@ print(discord.__version__)
 
 data_path = 'data'
 
-with open(f'{data_path}/secrets.json', 'r') as f:
-    content = f.read()
-    secrets = json.loads(content)
+# load token from env
+discord_token = os.getenv('DISCORD_TOKEN')
+if discord_token is None:
+    print("DISCORD_TOKEN not found", flush=True)
+    exit(1)
 
 # load all word lists in memory (ext is txt)
 words = []
@@ -97,4 +99,4 @@ async def summary(ctx):
     for message in messages:
         await ctx.send(message)
 
-bot.run(secrets['discord-token'], log_handler=handler, log_level=logging.INFO)
+bot.run(discord_token, log_handler=handler, log_level=logging.INFO)

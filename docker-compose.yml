@@ -19,6 +19,8 @@ services:
       - 8080
     volumes:
       - ./server:/app/data:rw
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN:?error}
   # security:
   #   build: ./security
   #   depends_on:

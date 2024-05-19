@@ -11,7 +11,7 @@
 - [x] store in database
   - [ ] use fancy/modern database
   - [x] create a summary report
-    - [ ] hide the bad words (*ss | a**)
+    - [x] hide the bad words (*ss | a**)
   - [x] multiple servers
     - [ ] give cross server summary
     - [ ] use guild id
@@ -21,5 +21,5 @@
 - [ ] create a pfp
 - [ ] use ai to determine if word is bad
 - [ ] find out how i should store secrets and word lists
-  - [ ] maybe use .env instead of secrets
+  - [x] maybe use .env instead of secrets
 - [ ] make this java so i can call it `nickel.jar`
