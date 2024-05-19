@@ -45,7 +45,7 @@ for file in os.listdir(f'{data_path}/'):
 print(f"Loaded {len(words)} word(s)", flush=True)
 logger.info(f"Loaded {len(words)} word(s)")
 
-time.sleep(10)
+time.sleep(20)
 conn = mysql.connector.connect(
     host="db",
     user=mysql_user,

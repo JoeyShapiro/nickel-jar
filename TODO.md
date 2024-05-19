@@ -7,6 +7,8 @@
   - [x] censor somtimes
   - [ ] look at user names
 - [ ] parse better (maybe regex)
+- [ ] make startup more stable of containers
+- [ ] add proper db check
 - [x] add a total command
 - [z] log better
 - [ ] add better word list
