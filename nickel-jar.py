@@ -66,11 +66,14 @@ async def on_message(message):
             # add_nickel(message)
             vulgarity[word] = vulgarity.get(word, 0) + 1
     
+    # round about way, but it works out
     cursor = conn.cursor()
     for word, count in vulgarity.items():
-        cursor.execute("insert into nickels (guild, username, word) VALUES (%s, %s, %s)",
-                       (message.guild.name, message.author.name, word)
-                      )
+        # oh lol. would only add once for each word
+        for _ in range(count):
+            cursor.execute("insert into nickels (guild, username, word) VALUES (%s, %s, %s)",
+                           (message.guild.name, message.author.name, word)
+                          )
     cursor.close()
 
 @bot.hybrid_command(
