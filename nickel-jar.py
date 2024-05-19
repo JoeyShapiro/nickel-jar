@@ -39,13 +39,14 @@ conn = mysql.connector.connect(
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='/', intents=intents)
 handler = logging.FileHandler(filename=f'{data_path}/discord.log', encoding='utf-8', mode='a')
 
 # client = discord.Client(intents=intents)
 
 @bot.event
 async def on_ready():
+    await bot.tree.sync(guild=discord.Object(id=563490477672759326))
     print(f'We have logged in as {bot.user}', flush=True)
 
 @bot.event
@@ -72,24 +73,36 @@ async def on_message(message):
                       )
     cursor.close()
 
-@bot.command()
+@bot.hybrid_command(
+    name="word_list",
+    description="Get the number of words in the list",
+    guild=discord.Object(id=563490477672759326)
+)
 async def word_list(ctx):
+    print(f"word_list called by {ctx.author.name}", flush=True)
     await ctx.send(f"Loaded {len(words)} word(s)")
 
-@bot.command()
-async def summary(ctx):
+@bot.hybrid_command(
+    name="summary",
+    description="Summarize the nickels you've added",
+    guild=discord.Object(id=563490477672759326)
+)
+async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"summary called by {ctx.author.name}", flush=True)
     cursor = conn.cursor()
-    cursor.execute("select word, count(*) from nickels where username=%s group by word", (ctx.author.name,))
+    stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if cross_guild else ''} group by word"
+    params = (ctx.author.name,) if not cross_guild else (ctx.author.name, ctx.guild.name)
+    cursor.execute(stmt, params)
     rows = cursor.fetchall()
     cursor.close()
     
     nickels = 0
     messages = [  ]
     for word, count in rows:
-        # convert word to a** format
-        # censored = word[0] + ('\*' * (len(word)-1))
-        messages.append(f"{word}: {count}")
+        if censor:
+            # convert word to a** format
+            censored = word[0] + ('\*' * (len(word)-1))
+        messages.append(f"{censored if censor else word}: {count}")
         nickels += count
     
     # add message to the beginning of the list
