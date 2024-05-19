@@ -22,7 +22,7 @@
 - [x] make containers
 - [ ] host on cloud
   - [ ] maybe fly.io
-- [ ] create a pfp
+- [x] create a pfp
 - [ ] use ai to determine if word is bad
 - [ ] find out how i should store secrets and word lists
   - [x] maybe use .env instead of secrets

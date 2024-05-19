@@ -1,4 +1,3 @@
-import json
 import discord
 from discord.ext import commands
 import logging
@@ -24,6 +23,18 @@ if discord_token is None:
     logger.error("DISCORD_TOKEN not found")
     exit(1)
 
+# load mysql creds from env
+mysql_user = os.getenv('MYSQL_USER')
+if mysql_user is None:
+    print("MYSQL_USER not found", flush=True)
+    logger.error("MYSQL_USER not found")
+    exit(1)
+mysql_password = os.getenv('MYSQL_PASSWORD')
+if mysql_password is None:
+    print("MYSQL_PASSWORD not found", flush=True)
+    logger.error("MYSQL_PASSWORD not found")
+    exit(1)
+
 # load all word lists in memory (ext is txt)
 words = []
 for file in os.listdir(f'{data_path}/'):
@@ -37,8 +48,8 @@ logger.info(f"Loaded {len(words)} word(s)")
 time.sleep(10)
 conn = mysql.connector.connect(
     host="db",
-    user="admin",
-    password="toor",
+    user=mysql_user,
+    password=mysql_password,
     database="nickeljar",
     autocommit=True
 )
@@ -77,7 +88,7 @@ async def on_message(message):
 
     nickels = sum(vulgarity.values())
     if nickels > 1:
-        await message.channel.send(f"{message.author} added {nickels} nickel(s) to the jar")
+        await message.channel.send(f"{message.author} added {nickels} nickels to the jar")
     elif nickels == 1:
         await message.channel.send(f"{message.author} added a nickel to the jar")
 

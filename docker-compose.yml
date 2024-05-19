@@ -21,6 +21,8 @@ services:
       - ./server:/app/data:rw
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN:?error}
+      MYSQL_USER: ${DB_USERNAME:-admin}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?error}
   # security:
   #   build: ./security
   #   depends_on:
