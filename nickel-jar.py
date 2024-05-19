@@ -109,7 +109,6 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     messages = [f"There are {nickels} nickels in the jar"] + messages
     messages.append(f"{ctx.author.name} has donated ${(nickels*0.05):.2f}")
     
-    for message in messages:
-        await ctx.send(message)
+    await ctx.send('\n'.join(messages))
 
 bot.run(discord_token, log_handler=handler, log_level=logging.INFO)

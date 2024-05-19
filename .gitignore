@@ -1,5 +1,4 @@
 .env
-secrets.json
 *.log
 
 # wordlists
