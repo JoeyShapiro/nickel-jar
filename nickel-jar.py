@@ -70,6 +70,10 @@ async def on_message(message):
     content = message.content.lower()
     # remove punctuation
     content = ''.join(e for e in content if e.isalnum() or e.isspace())
+
+    # TODO convert all numbers to words
+    # content = content.replace('0', 'o').replace('1', 'i')
+
     vulgarity = {}
     for word in content.split():
         if word in words:
