@@ -46,7 +46,7 @@ handler = logging.FileHandler(filename=f'{data_path}/discord.log', encoding='utf
 
 @bot.event
 async def on_ready():
-    await bot.tree.sync(guild=discord.Object(id=563490477672759326))
+    await bot.tree.sync()
     print(f'We have logged in as {bot.user}', flush=True)
 
 @bot.event
@@ -76,7 +76,6 @@ async def on_message(message):
 @bot.hybrid_command(
     name="word_list",
     description="Get the number of words in the list",
-    guild=discord.Object(id=563490477672759326)
 )
 async def word_list(ctx):
     print(f"word_list called by {ctx.author.name}", flush=True)
@@ -85,7 +84,6 @@ async def word_list(ctx):
 @bot.hybrid_command(
     name="summary",
     description="Summarize the nickels you've added",
-    guild=discord.Object(id=563490477672759326)
 )
 async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"summary called by {ctx.author.name}", flush=True)
