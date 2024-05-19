@@ -19,7 +19,7 @@ with open(f'{data_path}/secrets.json', 'r') as f:
 words = []
 for file in os.listdir(f'{data_path}/'):
     if file.endswith('.txt'):
-        with open(f'{data_path}/example.txt', 'r') as f:
+        with open(f'{data_path}/{file}', 'r') as f:
             for line in f:
                 words.append(line.strip())
 print(f"Loaded {len(words)} word(s)", flush=True)
