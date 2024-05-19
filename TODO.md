@@ -1,19 +1,23 @@
 - [x] create discord bot
   - [x] read messages
-  - [ ] use discord bot params
-  - [ ] nicely handle multiple flagged words in one message
+  - [x] use discord bot params
+  - [x] nicely handle multiple flagged words in one message
   - [ ] simplify permissions
-  - [ ] send one message for summary
-  - [ ] censor somtimes
+  - [x] send one message for summary
+  - [x] censor somtimes
+  - [ ] look at user names
+- [ ] parse better (maybe regex)
+- [x] add a total command
+- [z] log better
+- [ ] add better word list
 - [x] look up words in list
   - [x] multiple word lists
-  - [ ] add custom words
 - [x] store in database
   - [ ] use fancy/modern database
   - [x] create a summary report
     - [x] hide the bad words (*ss | a**)
   - [x] multiple servers
-    - [ ] give cross server summary
+    - [x] give cross server summary
     - [ ] use guild id
 - [x] make containers
 - [ ] host on cloud
