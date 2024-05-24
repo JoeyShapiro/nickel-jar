@@ -45,14 +45,23 @@ for file in os.listdir(f'{data_path}/'):
 print(f"Loaded {len(words)} word(s)", flush=True)
 logger.info(f"Loaded {len(words)} word(s)")
 
-time.sleep(20)
-conn = mysql.connector.connect(
-    host="db",
-    user=mysql_user,
-    password=mysql_password,
-    database="nickeljar",
-    autocommit=True
-)
+conn = None
+while conn is None:
+    try:
+        conn = mysql.connector.connect(
+            host="db",
+            user=mysql_user,
+            password=mysql_password,
+            database="nickeljar",
+            autocommit=True
+        )
+        break
+    except mysql.connector.Error as err:
+        print(f"Failed to connect to MySQL server: {err}")
+        time.sleep(1)
+    except Exception as e:
+        print(f"MySQL error occured: {e}")
+        exit(1)
 
 @bot.event
 async def on_ready():
@@ -105,7 +114,7 @@ async def word_list(ctx):
     logger.info(f"word_list called by {ctx.author.name}")
     await ctx.send(f"Loaded {len(words)} word(s)")
 
-@bot.hybrid_command(
+@bot.hybrid_command( 
     name="summary",
     description="Summarize the nickels you've added",
 )
@@ -114,7 +123,7 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     logger.info(f"summary called by {ctx.author.name}")
 
     cursor = conn.cursor()
-    stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if cross_guild else ''} group by word"
+    stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if not cross_guild else ''} group by word"
     params = (ctx.author.name,) if not cross_guild else (ctx.author.name, ctx.guild.name)
     cursor.execute(stmt, params)
     rows = cursor.fetchall()
