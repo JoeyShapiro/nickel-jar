@@ -153,8 +153,8 @@ async def total(ctx, censor: bool=False, cross_guild: bool=False):
     logger.info(f"total called by {ctx.author.name}")
 
     cursor = conn.cursor()
-    stmt = f"select word, count(*) from nickels {'where guild=%s' if cross_guild else ''} group by word"
-    params = (ctx.guild.name,) if cross_guild else ()
+    stmt = f"select word, count(*) from nickels {'where guild=%s' if not cross_guild else ''} group by word"
+    params = (ctx.guild.name,) if not cross_guild else ()
     cursor.execute(stmt, params)
     rows = cursor.fetchall()
     cursor.close()
