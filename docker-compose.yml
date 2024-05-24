@@ -4,6 +4,7 @@ services:
     image: mysql
     volumes:
       - ./schemas:/docker-entrypoint-initdb.d:ro
+      - db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?error}
       MYSQL_DATABASE: nickeljar
@@ -21,3 +22,5 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN:?error}
       MYSQL_USER: ${DB_USERNAME:-admin}
       MYSQL_PASSWORD: ${DB_PASSWORD:?error}
+volumes:
+  db:
