@@ -124,7 +124,7 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
 
     cursor = conn.cursor()
     stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if not cross_guild else ''} group by word"
-    params = (ctx.author.name,) if not cross_guild else (ctx.author.name, ctx.guild.name)
+    params = (ctx.author.name, ctx.guild.name) if not cross_guild else (ctx.author.name,)
     cursor.execute(stmt, params)
     rows = cursor.fetchall()
     cursor.close()
