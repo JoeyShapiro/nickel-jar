@@ -5,6 +5,26 @@ import os
 import mysql.connector
 import time
 
+def db_connect():
+    conn = None
+    while conn is None:
+        try:
+            conn = mysql.connector.connect(
+                host="db",
+                user=mysql_user,
+                password=mysql_password,
+                database="nickeljar",
+                autocommit=True
+            )
+            break
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server: {err}")
+            time.sleep(1)
+        except Exception as e:
+            print(f"MySQL error occured: {e}")
+            exit(1)
+    return conn
+
 data_path = 'data'
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -45,23 +65,7 @@ for file in os.listdir(f'{data_path}/'):
 print(f"Loaded {len(words)} word(s)", flush=True)
 logger.info(f"Loaded {len(words)} word(s)")
 
-conn = None
-while conn is None:
-    try:
-        conn = mysql.connector.connect(
-            host="db",
-            user=mysql_user,
-            password=mysql_password,
-            database="nickeljar",
-            autocommit=True
-        )
-        break
-    except mysql.connector.Error as err:
-        print(f"Failed to connect to MySQL server: {err}")
-        time.sleep(1)
-    except Exception as e:
-        print(f"MySQL error occured: {e}")
-        exit(1)
+conn = db_connect()
 
 @bot.event
 async def on_ready():
@@ -89,6 +93,10 @@ async def on_message(message):
             # add_nickel(message)
             vulgarity[word] = vulgarity.get(word, 0) + 1
     
+    if not conn.is_connected():
+        conn = db_connect()
+        logger.info("Reconnected to MySQL")
+
     # round about way, but it works out
     cursor = conn.cursor()
     for word, count in vulgarity.items():
@@ -122,6 +130,10 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"summary called by {ctx.author.name}", flush=True)
     logger.info(f"summary called by {ctx.author.name}")
 
+    if not conn.is_connected():
+        conn = db_connect()
+        logger.info("Reconnected to MySQL")
+
     cursor = conn.cursor()
     stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if not cross_guild else ''} group by word"
     params = (ctx.author.name, ctx.guild.name) if not cross_guild else (ctx.author.name,)
@@ -151,6 +163,10 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
 async def total(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"total called by {ctx.author.name}", flush=True)
     logger.info(f"total called by {ctx.author.name}")
+
+    if not conn.is_connected():
+        conn = db_connect()
+        logger.info("Reconnected to MySQL")
 
     cursor = conn.cursor()
     stmt = f"select word, count(*) from nickels {'where guild=%s' if not cross_guild else ''} group by word"
