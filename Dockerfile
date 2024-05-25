@@ -15,4 +15,4 @@ COPY nickel-jar.py /app/nickel-jar.py
 
 WORKDIR /app
 
-ENTRYPOINT [ "python", "/app/nickel-jar.py" ]
+ENTRYPOINT [ "python", "-u", "/app/nickel-jar.py" ]

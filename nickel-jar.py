@@ -19,13 +19,13 @@ def db_connect():
             )
             break
         except mysql.connector.Error as err:
-            print(f"Failed to connect to MySQL server: {err}", flush=True)
+            print(f"Failed to connect to MySQL server: {err}")
             time.sleep(1)
         except Exception as e:
-            print(f"MySQL error occured: {e}", flush=True)
+            print(f"MySQL error occured: {e}")
             exit(1)
 
-    print("Connected to MySQL", flush=True)
+    print("Connected to MySQL")
     return conn
 
 data_path = 'data'
@@ -42,19 +42,19 @@ logger.addHandler(handler)
 # load token from env
 discord_token = os.getenv('DISCORD_TOKEN')
 if discord_token is None:
-    print("DISCORD_TOKEN not found", flush=True)
+    print("DISCORD_TOKEN not found")
     logger.error("DISCORD_TOKEN not found")
     exit(1)
 
 # load mysql creds from env
 mysql_user = os.getenv('MYSQL_USER')
 if mysql_user is None:
-    print("MYSQL_USER not found", flush=True)
+    print("MYSQL_USER not found")
     logger.error("MYSQL_USER not found")
     exit(1)
 mysql_password = os.getenv('MYSQL_PASSWORD')
 if mysql_password is None:
-    print("MYSQL_PASSWORD not found", flush=True)
+    print("MYSQL_PASSWORD not found")
     logger.error("MYSQL_PASSWORD not found")
     exit(1)
 
@@ -65,7 +65,7 @@ for file in os.listdir(f'{data_path}/'):
         with open(f'{data_path}/{file}', 'r') as f:
             for line in f:
                 words.append(line.strip())
-print(f"Loaded {len(words)} word(s)", flush=True)
+print(f"Loaded {len(words)} word(s)")
 logger.info(f"Loaded {len(words)} word(s)")
 
 conn = db_connect()
@@ -73,7 +73,7 @@ conn = db_connect()
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f'We have logged in as {bot.user}', flush=True)
+    print(f'We have logged in as {bot.user}')
     logger.info(f'We have logged in as {bot.user}')
 
 @bot.event
@@ -122,7 +122,7 @@ async def on_message(message):
     description="Get the number of words in the list",
 )
 async def word_list(ctx):
-    print(f"word_list called by {ctx.author.name}", flush=True)
+    print(f"word_list called by {ctx.author.name}")
     logger.info(f"word_list called by {ctx.author.name}")
     await ctx.send(f"Loaded {len(words)} word(s)")
 
@@ -131,7 +131,7 @@ async def word_list(ctx):
     description="Summarize the nickels you've added",
 )
 async def summary(ctx, censor: bool=False, cross_guild: bool=False):
-    print(f"summary called by {ctx.author.name}", flush=True)
+    print(f"summary called by {ctx.author.name}")
     logger.info(f"summary called by {ctx.author.name}")
     conn = globals().get('conn')
 
@@ -165,7 +165,7 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     description="Total nickels in the jar",
 )
 async def total(ctx, censor: bool=False, cross_guild: bool=False):
-    print(f"total called by {ctx.author.name}", flush=True)
+    print(f"total called by {ctx.author.name}")
     logger.info(f"total called by {ctx.author.name}")
     conn = globals().get('conn')
 
