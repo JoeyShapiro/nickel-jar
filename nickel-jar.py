@@ -25,6 +25,7 @@ def db_connect():
             print(f"MySQL error occured: {e}")
             exit(1)
 
+    logger.info("Connected to MySQL")
     print("Connected to MySQL")
     return conn
 
@@ -37,6 +38,10 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 handler = logging.FileHandler(filename=f'{data_path}/discord.log', encoding='utf-8', mode='a')
+
+dt_fmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # load token from env
