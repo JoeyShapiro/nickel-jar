@@ -29,3 +29,4 @@
 - [ ] find out how i should store secrets and word lists
   - [x] maybe use .env instead of secrets
 - [ ] make this java so i can call it `nickel.jar`
+- [ ] report errors

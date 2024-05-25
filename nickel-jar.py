@@ -14,15 +14,18 @@ def db_connect():
                 user=mysql_user,
                 password=mysql_password,
                 database="nickeljar",
-                autocommit=True
+                autocommit=True,
+                connect_timeout=10
             )
             break
         except mysql.connector.Error as err:
-            print(f"Failed to connect to MySQL server: {err}")
+            print(f"Failed to connect to MySQL server: {err}", flush=True)
             time.sleep(1)
         except Exception as e:
-            print(f"MySQL error occured: {e}")
+            print(f"MySQL error occured: {e}", flush=True)
             exit(1)
+
+    print("Connected to MySQL", flush=True)
     return conn
 
 data_path = 'data'
@@ -87,6 +90,8 @@ async def on_message(message):
     # TODO convert all numbers to words
     # content = content.replace('0', 'o').replace('1', 'i')
 
+    conn = globals().get('conn')
+
     vulgarity = {}
     for word in content.split():
         if word in words:
@@ -95,7 +100,6 @@ async def on_message(message):
     
     if not conn.is_connected():
         conn = db_connect()
-        logger.info("Reconnected to MySQL")
 
     # round about way, but it works out
     cursor = conn.cursor()
@@ -129,10 +133,10 @@ async def word_list(ctx):
 async def summary(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"summary called by {ctx.author.name}", flush=True)
     logger.info(f"summary called by {ctx.author.name}")
+    conn = globals().get('conn')
 
     if not conn.is_connected():
         conn = db_connect()
-        logger.info("Reconnected to MySQL")
 
     cursor = conn.cursor()
     stmt = f"select word, count(*) from nickels where username=%s {'and guild=%s' if not cross_guild else ''} group by word"
@@ -163,10 +167,10 @@ async def summary(ctx, censor: bool=False, cross_guild: bool=False):
 async def total(ctx, censor: bool=False, cross_guild: bool=False):
     print(f"total called by {ctx.author.name}", flush=True)
     logger.info(f"total called by {ctx.author.name}")
+    conn = globals().get('conn')
 
     if not conn.is_connected():
         conn = db_connect()
-        logger.info("Reconnected to MySQL")
 
     cursor = conn.cursor()
     stmt = f"select word, count(*) from nickels {'where guild=%s' if not cross_guild else ''} group by word"
