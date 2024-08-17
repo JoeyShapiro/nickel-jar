@@ -199,4 +199,37 @@ async def total(ctx, censor: bool=False, cross_guild: bool=False):
     
     await ctx.send('\n'.join(messages))
 
+@bot.hybrid_command(
+    name="birthday",
+    description="Add a birthday to the list",
+)
+async def birthday(ctx, username: str, date: str):
+    print(f"birthday called by {ctx.author.name}")
+    logger.info(f"birthday called by {ctx.author.name}")
+    conn = globals().get('conn')
+
+    # check date is in sql format
+    try:
+        time.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        await ctx.send("Date must be in the format YYYY-MM-DD")
+        return
+    
+    # check if user is in @ format
+    if not username.startswith('@'):
+        await ctx.send("Username must be in the format @username")
+        return
+
+    if not conn.is_connected():
+        conn = db_connect()
+
+    # upsert user
+    cursor = conn.cursor()
+    cursor.execute("insert into birthdays (guild, username, date, added_by) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE date=%s",
+                   (ctx.guild.name, username, date, ctx.author.name, date)
+                  )
+    cursor.close()
+
+    await ctx.send("added birthday")
+
 bot.run(discord_token, log_handler=None)
