@@ -4,6 +4,7 @@ import logging
 import os
 import mysql.connector
 import time
+import asyncio
 
 def db_connect():
     conn = None
@@ -76,46 +77,69 @@ logger.info(f"Loaded {len(words)} word(s)")
 conn = db_connect()
 
 async def wait_for_bdays():
+    said_happy_bday = False
+    last_ran = None
+
     while True:
+        # reset if last_ran is not today
+        if said_happy_bday and last_ran != time.strftime('%Y-%m-%d'):
+            said_happy_bday = False
+
+        # get the current hour of the day as local time
+        # TODO cant handle timezones, but i just wanna make a game rn
+        hour = int(time.strftime('%H'))
+        # wait until 9am est
+        if hour < 14 or said_happy_bday:
+            await asyncio.sleep(3600)
+            continue
+
         # get the date in the format YYYY-MM-DD
         today = time.strftime('%Y-%m-%d')
 
+        conn = globals().get('conn')
         if not conn.is_connected():
             conn = db_connect()
 
         # get the channel to use from the settings table
         # TODO cant handle guilds, but i just wanna make a game rn
         cursor = conn.cursor()
-        cursor.execute("select channel from settings limit 1")
+        cursor.execute("select value from settings where setting='channel' limit 1")
         rows = cursor.fetchall()
         cursor.close()
 
         if len(rows) == 0:
             print("No channel found")
             logger.error("No channel found")
-            return
+            await asyncio.sleep(3600)
+            continue
         
-        channel_id = int(bot.get_channel(rows[0][0]))
+        channel_id = int(rows[0][0])
         
         cursor = conn.cursor()
-        cursor.execute("select guild, username from birthdays where date=%s", (today,))
+        cursor.execute("select guild, user_id from birthdays where month(birthday)=month(%s) and day(birthday)=day(%s)", (today, today))
         rows = cursor.fetchall()
         cursor.close()
 
-        for guild, username in rows:
+        for guild, user_id in rows:
             guild = bot.get_guild(guild)
             if guild is None:
                 continue
 
             channel = guild.get_channel(channel_id)
 
-            await channel.send(f"Happy birthday {username}!")
+            await channel.send(f"Happy birthday <@{user_id}> !")
+
+        said_happy_bday = True
+        last_ran = time.strftime('%Y-%m-%d')
 
 @bot.event
 async def on_ready():
     await bot.tree.sync()
     print(f'We have logged in as {bot.user}')
     logger.info(f'We have logged in as {bot.user}')
+
+    # run the birthday thread
+    asyncio.create_task(wait_for_bdays())
 
 @bot.event
 async def on_message(message):
@@ -239,7 +263,7 @@ async def total(ctx, censor: bool=False, cross_guild: bool=False):
     name="birthday",
     description="Add a birthday to the list. Date should be in the format YYYY-MM-DD",
 )
-async def birthday(ctx, username: str, date: str):
+async def birthday(ctx, user: discord.User, date: str):
     print(f"birthday called by {ctx.author.name}")
     logger.info(f"birthday called by {ctx.author.name}")
     conn = globals().get('conn')
@@ -250,19 +274,14 @@ async def birthday(ctx, username: str, date: str):
     except ValueError:
         await ctx.send("Date must be in the format YYYY-MM-DD")
         return
-    
-    # check if user is in @ format
-    if not username.startswith('@'):
-        await ctx.send("Username must be in the format @username")
-        return
 
     if not conn.is_connected():
         conn = db_connect()
 
     # upsert user
     cursor = conn.cursor()
-    cursor.execute("insert into birthdays (guild, username, date, added_by) VALUES (%d, %s, %s, %s) ON DUPLICATE KEY UPDATE date=%s",
-                   (ctx.guild.id, username, date, ctx.author.name, date)
+    cursor.execute("insert into birthdays (guild, user_id, birthday, added_by) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE birthday=%s",
+                   (ctx.guild.id, user.id, date, ctx.author.name, date)
                   )
     cursor.close()
 
@@ -281,11 +300,16 @@ async def channel(ctx):
         conn = db_connect()
 
     cursor = conn.cursor()
-    cursor.execute("insert into settings (channel) VALUES (%s) ON DUPLICATE KEY UPDATE channel=%s",
-                   (ctx.channel.id, ctx.channel.id)
-                  )
+    try:
+        cursor.execute("insert into settings (guild, setting, value, set_by) VALUES (%s, 'channel', %s, %s) ON DUPLICATE KEY UPDATE value=%s",
+                    (ctx.guild.id, str(ctx.channel.id), ctx.author.name, str(ctx.channel.id))
+                    )
+    except Exception as e:
+        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
+        await ctx.send("error setting channel:", e)
+    else:
+        await ctx.send("channel set")
     cursor.close()
-
-    await ctx.send("channel set")
 
 bot.run(discord_token, log_handler=None)
