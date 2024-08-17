@@ -75,6 +75,42 @@ logger.info(f"Loaded {len(words)} word(s)")
 
 conn = db_connect()
 
+async def wait_for_bdays():
+    while True:
+        # get the date in the format YYYY-MM-DD
+        today = time.strftime('%Y-%m-%d')
+
+        if not conn.is_connected():
+            conn = db_connect()
+
+        # get the channel to use from the settings table
+        # TODO cant handle guilds, but i just wanna make a game rn
+        cursor = conn.cursor()
+        cursor.execute("select channel from settings limit 1")
+        rows = cursor.fetchall()
+        cursor.close()
+
+        if len(rows) == 0:
+            print("No channel found")
+            logger.error("No channel found")
+            return
+        
+        channel_id = int(bot.get_channel(rows[0][0]))
+        
+        cursor = conn.cursor()
+        cursor.execute("select guild, username from birthdays where date=%s", (today,))
+        rows = cursor.fetchall()
+        cursor.close()
+
+        for guild, username in rows:
+            guild = bot.get_guild(guild)
+            if guild is None:
+                continue
+
+            channel = guild.get_channel(channel_id)
+
+            await channel.send(f"Happy birthday {username}!")
+
 @bot.event
 async def on_ready():
     await bot.tree.sync()
@@ -201,7 +237,7 @@ async def total(ctx, censor: bool=False, cross_guild: bool=False):
 
 @bot.hybrid_command(
     name="birthday",
-    description="Add a birthday to the list",
+    description="Add a birthday to the list. Date should be in the format YYYY-MM-DD",
 )
 async def birthday(ctx, username: str, date: str):
     print(f"birthday called by {ctx.author.name}")
@@ -225,11 +261,31 @@ async def birthday(ctx, username: str, date: str):
 
     # upsert user
     cursor = conn.cursor()
-    cursor.execute("insert into birthdays (guild, username, date, added_by) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE date=%s",
-                   (ctx.guild.name, username, date, ctx.author.name, date)
+    cursor.execute("insert into birthdays (guild, username, date, added_by) VALUES (%d, %s, %s, %s) ON DUPLICATE KEY UPDATE date=%s",
+                   (ctx.guild.id, username, date, ctx.author.name, date)
                   )
     cursor.close()
 
     await ctx.send("added birthday")
+
+@bot.hybrid_command(
+    name="channel",
+    description="Set this channel to send messages",
+)
+async def channel(ctx):
+    print(f"channel called by {ctx.author.name}")
+    logger.info(f"channel called by {ctx.author.name}")
+    conn = globals().get('conn')
+
+    if not conn.is_connected():
+        conn = db_connect()
+
+    cursor = conn.cursor()
+    cursor.execute("insert into settings (channel) VALUES (%s) ON DUPLICATE KEY UPDATE channel=%s",
+                   (ctx.channel.id, ctx.channel.id)
+                  )
+    cursor.close()
+
+    await ctx.send("channel set")
 
 bot.run(discord_token, log_handler=None)

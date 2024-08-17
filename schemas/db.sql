@@ -9,14 +9,24 @@ create table nickels
     messaged_on datetime default (now()) not null
 );
 
--- auto-generated definition
 create table birthdays
 (
     id          int auto_increment
         primary key,
-    guild       text                     not null,
+    guild       int                      not null,
     username    text                     not null,
     birthday    datetime                 not null,
     added_by    text                     not null,
     added_on    datetime default (now()) not null
+);
+
+create table settings
+(
+    id          int auto_increment
+        primary key,
+    guild       int                      not null,
+    setting     text                     not null,
+    value       text                     not null,
+    set_by      text                     not null,
+    set_on      datetime default (now()) not null
 );
